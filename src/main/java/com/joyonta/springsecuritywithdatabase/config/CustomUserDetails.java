@@ -15,6 +15,7 @@ public class CustomUserDetails implements UserDetails {
     private final User user;
 
     public CustomUserDetails(User user) {
+        System.out.println("CustomUserDetails() called");
         this.user = user;
     }
 
