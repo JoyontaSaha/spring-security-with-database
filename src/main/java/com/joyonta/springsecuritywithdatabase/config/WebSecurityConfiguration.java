@@ -3,6 +3,7 @@ package com.joyonta.springsecuritywithdatabase.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,19 +34,43 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                // disabling csrf here, you should enable it before using in production
+                .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
+                /*.antMatchers("/")
+                .permitAll()*/
+                .antMatchers(HttpMethod.DELETE, "/management/api/**").permitAll()
                 .antMatchers("/home")
                 .hasAnyAuthority("USER", "ADMIN")
                 .antMatchers("/admin")
                 .hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/adminDelete/**")
+                .hasAuthority("ADMIN")
+                .antMatchers("/userPost")
+                .hasAuthority("USER")
+                .antMatchers("/userPut/**")
+                .hasAnyAuthority("USER", "ADMIN")
                 .anyRequest()
                 .authenticated()
                 .and()
                 .httpBasic();
+
+
+       /* http
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
+                *//*.antMatchers("/api/**").hasRole(STUDENT.name())
+                .antMatchers(HttpMethod.DELETE, "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .antMatchers(HttpMethod.POST, "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .antMatchers(HttpMethod.PUT, "/management/api/**").hasAuthority(COURSE_WRITE.getPermission())
+                .antMatchers("/management/api/**").hasAnyRole(ADMIN.name(), ADMINTRAINEE.name())*//*
+                .anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic();*/
     }
 }
