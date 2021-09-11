@@ -15,12 +15,12 @@ public class HomeController {
         return "Welcome to Home.";
     }
 
-    @PostMapping(value = "/admin")
-    public String admin(@Param("num") Integer num) {
+    /*@PostMapping(value = "/admin")
+    public String admin(@PathVariable("num") Integer num) {
         System.out.println("admin() called");
         System.out.println("num: " + num);
         return "Welcome Admin." + num;
-    }
+    }*/
 
     @PostMapping(value = "/test")
     public String test() {
@@ -28,7 +28,7 @@ public class HomeController {
     }
 
     @DeleteMapping("/deleteDepartmentById/{id}")
-    public String deleteDepartmentById (@Param("id") Integer id) {
+    public String deleteDepartmentById (@PathVariable("id") Integer id) {
         return "Department deleted successfully " + id;
     }
 }

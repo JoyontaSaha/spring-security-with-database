@@ -41,7 +41,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         System.out.println("configure() called");
 
-        Map<KeyPair, List<String>> apiUrlAndRoleHashMap = new HashMap<>();
+        /*Map<KeyPair, List<String>> apiUrlAndRoleHashMap = new HashMap<>();
 
         apiUrlRoleRepository.findAll().forEach(apiUrlRole ->
         {
@@ -62,17 +62,31 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         });
 
         apiUrlAndRoleHashMap.entrySet().forEach(entry ->
-                        System.out.println("key: " + entry.getKey() + " value: " + entry.getValue()));
+                        System.out.println("key: " + entry.getKey() + " value: " + entry.getValue()));*/
 
-        http
+        /**
+         *  It turned out that antMatcher was working as expected
+         *  & allowing all URLs as intended, but the reason for
+         *  the forbidden response that was getting for the POST APIs was that
+         *  Spring security was waiting for csrf token for
+         *  these POST requests because CSRF protection is enabled
+         *  by default in spring security.
+         *
+         * So in order to make it work , must provide the csrf token in POST request
+         * OR temporarily turn CSRF protection off
+         * (but should enable it again before going to production as this is a serious attack)
+         *
+         */
+       /* http
+                // disabling csrf here, you should enable it before using in production
+                .csrf().disable()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .authorizeRequests()
-                .antMatchers("/").permitAll();
-        http
-                .authorizeRequests()
-                .antMatchers("/deleteDepartmentById/**").hasRole("ADMIN");
+                .antMatchers("/").permitAll()
+                .antMatchers("/deleteDepartmentById/**").hasRole("ADMIN")
+                .antMatchers("/test").hasRole("ADMIN");*/
 
         /*apiUrlAndRoleHashMap.entrySet().forEach(entry -> {
             try {
@@ -96,6 +110,44 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         });*/
 
+        /*http.authorizeRequests().anyRequest().authenticated()
+                .and()
+                .httpBasic();*/
+
+
+        http
+                // disabling csrf here, you should enable it before using in production
+                .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+                /*.antMatchers("/")
+                .permitAll()*/
+                /*.antMatchers(HttpMethod.DELETE, "/management/api/**").permitAll()
+                .antMatchers("/home")
+                .hasAnyAuthority("USER", "ADMIN")
+                .antMatchers("/admin")
+                .hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/adminDelete/**")
+                .hasAuthority("ADMIN")
+                .antMatchers("/userPost")
+                .hasAuthority("USER")
+                .antMatchers("/userPut/**")
+                .hasAnyAuthority("USER", "ADMIN")*/
+        http
+                .authorizeRequests()
+                .antMatchers("/test")
+                .hasAnyAuthority("USER", "ADMIN");
+
+        http
+                .authorizeRequests()
+                .antMatchers("/deleteDepartmentById/**")
+                .hasAuthority("ADMIN");
+
+                /*.anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic();*/
         http.authorizeRequests().anyRequest().authenticated()
                 .and()
                 .httpBasic();
