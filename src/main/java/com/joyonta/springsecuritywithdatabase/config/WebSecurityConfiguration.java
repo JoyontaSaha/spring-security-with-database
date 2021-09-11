@@ -41,7 +41,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         System.out.println("configure() called");
 
-        /*Map<KeyPair, List<String>> apiUrlAndRoleHashMap = new HashMap<>();
+        Map<KeyPair, List<String>> apiUrlAndRoleHashMap = new HashMap<>();
 
         apiUrlRoleRepository.findAll().forEach(apiUrlRole ->
         {
@@ -62,7 +62,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         });
 
         apiUrlAndRoleHashMap.entrySet().forEach(entry ->
-                        System.out.println("key: " + entry.getKey() + " value: " + entry.getValue()));*/
+                        System.out.println("key: " + entry.getKey() + " value: " + entry.getValue()));
 
         /**
          *  It turned out that antMatcher was working as expected
@@ -77,80 +77,38 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
          * (but should enable it again before going to production as this is a serious attack)
          *
          */
-       /* http
-                // disabling csrf here, you should enable it before using in production
-                .csrf().disable()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/").permitAll()
-                .antMatchers("/deleteDepartmentById/**").hasRole("ADMIN")
-                .antMatchers("/test").hasRole("ADMIN");*/
-
-        /*apiUrlAndRoleHashMap.entrySet().forEach(entry -> {
-            try {
-                String[] roles = entry.getValue().stream().toArray(String[]::new);
-                System.out.println("roles: " + Arrays.toString(roles));
-
-                String apiurl = entry.getKey().getApiurl();
-                System.out.println("apiurl : " + apiurl);
-                if(roles.length > 1) {
-//                    http.authorizeRequests().antMatchers(getHttpMethod(entry.getKey().getMethodname()), entry.getKey().getApiurl()).hasAnyAuthority(roles);
-                    http.authorizeRequests().antMatchers(apiurl).hasAnyAuthority(roles);
-
-                } else {
-//                    http.authorizeRequests().antMatchers(getHttpMethod(entry.getKey().getMethodname()), entry.getKey().getApiurl()).hasAuthority(roles[0]);
-                    http.authorizeRequests().antMatchers(apiurl).hasAuthority(roles[0]);
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });*/
-
-        /*http.authorizeRequests().anyRequest().authenticated()
-                .and()
-                .httpBasic();*/
-
-
         http
                 // disabling csrf here, you should enable it before using in production
                 .csrf().disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-                /*.antMatchers("/")
-                .permitAll()*/
-                /*.antMatchers(HttpMethod.DELETE, "/management/api/**").permitAll()
-                .antMatchers("/home")
-                .hasAnyAuthority("USER", "ADMIN")
-                .antMatchers("/admin")
-                .hasAuthority("ADMIN")
-                .antMatchers(HttpMethod.DELETE, "/adminDelete/**")
-                .hasAuthority("ADMIN")
-                .antMatchers("/userPost")
-                .hasAuthority("USER")
-                .antMatchers("/userPut/**")
-                .hasAnyAuthority("USER", "ADMIN")*/
-        http
-                .authorizeRequests()
-                .antMatchers("/test")
-                .hasAnyAuthority("USER", "ADMIN");
 
-        http
-                .authorizeRequests()
-                .antMatchers("/deleteDepartmentById/**")
-                .hasAuthority("ADMIN");
+        apiUrlAndRoleHashMap.entrySet().forEach(entry -> {
+            try {
+                String[] roles = entry.getValue().stream().toArray(String[]::new);
+                System.out.println("roles: " + Arrays.toString(roles));
 
-                /*.anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();*/
+                String apiurl = entry.getKey().getApiurl();
+                System.out.println("apiurl : " + apiurl);
+
+                if(roles.length > 1) {
+                    http.authorizeRequests().antMatchers(getHttpMethod(entry.getKey().getMethodname()), entry.getKey().getApiurl()).hasAnyAuthority(roles);
+
+                } else {
+                    http.authorizeRequests().antMatchers(getHttpMethod(entry.getKey().getMethodname()), entry.getKey().getApiurl()).hasAuthority(roles[0]);
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+
         http.authorizeRequests().anyRequest().authenticated()
                 .and()
                 .httpBasic();
+
 
     }
 
@@ -172,7 +130,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Data
-    private class KeyPair {
+    public class KeyPair {
         private String apiurl;
         private String methodname;
 
@@ -181,4 +139,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             this.methodname = methodname;
         }
     }
+
+
 }

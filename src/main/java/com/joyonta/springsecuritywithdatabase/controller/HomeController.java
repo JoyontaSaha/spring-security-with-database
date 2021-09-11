@@ -1,5 +1,6 @@
 package com.joyonta.springsecuritywithdatabase.controller;
 
+import com.joyonta.springsecuritywithdatabase.model.User;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,12 +16,10 @@ public class HomeController {
         return "Welcome to Home.";
     }
 
-    /*@PostMapping(value = "/admin")
-    public String admin(@PathVariable("num") Integer num) {
-        System.out.println("admin() called");
-        System.out.println("num: " + num);
-        return "Welcome Admin." + num;
-    }*/
+    @PutMapping(value = "/admin/{num}")
+    public String admin(@PathVariable("num") Integer num, @RequestBody User user) {
+        return "Welcome Admin." + num + " put: " + user;
+    }
 
     @PostMapping(value = "/test")
     public String test() {
